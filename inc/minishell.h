@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/19 16:07:12 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/19 17:05:52 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <signal.h>
+# include <time.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "/home/akim/42/minishell/minishell/inc/libft/inc/libft.h"

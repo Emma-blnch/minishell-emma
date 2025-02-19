@@ -6,13 +6,13 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:21 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/19 16:09:48 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/19 17:05:43 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	exec_with_fork(t_shell *shell, t_cmd *cmd)
+int	exec_with_process(t_shell *shell, t_cmd *cmd)
 {
 	if (cmd->exit_code)
 		return (cmd->exit_code);
