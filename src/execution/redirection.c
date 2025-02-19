@@ -6,75 +6,73 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:46:20 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:46:23 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/19 15:11:50 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	open_file(t_file *file, t_cmd *cmd, int mode)
+int	open_file(t_file *file, t_cmd *cmd, int mode)
 {
-	file->fd = 0;
+	int	flags;
+
 	if (mode == READ)
-		file->fd = open(file->path, O_RDONLY);
-	if (mode == WRITE)
-		file->fd = open(file->path, O_WRONLY | O_TRUNC | O_CREAT, 0666);
-	if (mode == APPEND)
-		file->fd = open(file->path, O_RDWR | O_APPEND | O_CREAT, 0666);
+		flags = O_RDONLY;
+	else if (mode == WRITE)
+		flags = O_WRONLY | O_TRUNC | O_CREAT;
+	else if (mode == APPEND)
+		flags = O_RDWR | O_APPEND | O_CREAT;
+	file->fd = open(file->path, flags, 0666);
 	if (file->fd == -1)
-		return (set_cmd_error(OPEN_ERROR, cmd, "Error while opening file"));
+	{
+		set_cmd_error(OPEN_ERROR, cmd, "Error while opening file");
+		return (-1);
+	}
+	return (file->fd);
 }
 
-void	set_infile_fd(t_shell *shell, t_cmd *cmd)
+void    get_input_fd(t_shell *shell, t_cmd *cmd)
 {
-	t_file	*file;
+    t_file  *file;
 
-	if (cmd->infiles == NULL)
-	{
-		cmd->fd_in = STDIN_FILENO;
-		return ;
-	}
-	while (cmd->infiles)
-	{
-		file = (t_file *)cmd->infiles->content;
-		if (file->mode == HEREDOC)
-			assemble_heredoc(shell, cmd, cmd->infiles);
-		if (access(file->path, F_OK) == -1)
-			return (set_cmd_error(NO_FILE, cmd, "No input file"));
-		if (access(file->path, R_OK) == -1)
-			return (set_cmd_error(READ_ERROR, cmd, "Forbidden input file"));
-		open_file(file, cmd, READ);
-		if (cmd->infiles->next)
-			close(file->fd);
-		cmd->infiles = cmd->infiles->next;
-	}
-	cmd->fd_in = file->fd;
+    if (cmd->infiles == NULL)
+    {
+        (cmd->fd_in = STDIN_FILENO);
+        return ;
+    }
+    file = (t_file *)cmd->infiles->content;
+    if (file->mode == HEREDOC)
+        manage_heredoc(shell, cmd, cmd->infiles);
+    else
+    {
+        if (access(file->path, F_OK) == -1)
+            return (set_cmd_error(NO_FILE, cmd, "Input file not found"));
+        if (access(file->path, R_OK) == -1)
+            return (set_cmd_error(READ_ERROR, cmd, "Permission denied for input file"));
+        cmd->fd_in = open(file->path, O_RDONLY);
+        if (cmd->fd_in == -1)
+            return (set_cmd_error(OPEN_ERROR, cmd, "Failed to open input file"));
+    }
 }
 
-void	set_outfile_fd(t_cmd *cmd)
+void    get_output_fd(t_cmd *cmd)
 {
-	t_file	*file;
+    t_file  *file;
 
-	if (cmd->outfiles == NULL)
-	{
-		cmd->fd_out = STDOUT_FILENO;
-		return ;
-	}
-	while (cmd->outfiles)
-	{
-		file = (t_file *)cmd->outfiles->content;
-		if (access(file->path, F_OK) == 0 && access(file->path, W_OK) == -1)
-			return (set_cmd_error(READ_ERROR, cmd, "Forbidden output file"));
-		if (file->mode == APPEND)
-			open_file(file, cmd, APPEND);
-		else
-			open_file(file, cmd, WRITE);
-		if (cmd->outfiles->next)
-			close(file->fd);
-		cmd->outfiles = cmd->outfiles->next;
-	}
-	cmd->fd_out = file->fd;
+    if (cmd->outfiles == NULL)
+    {
+        (cmd->fd_out = STDOUT_FILENO);
+        return ;
+    }
+    file = (t_file *)cmd->outfiles->content;
+    if (access(file->path, F_OK) == 0 && access(file->path, W_OK) == -1)
+        return (set_cmd_error(READ_ERROR, cmd, "Write permission denied on output file"));
+    int flags = O_WRONLY | O_CREAT | O_TRUNC;
+    cmd->fd_out = open(file->path, flags, 0644);
+    if (cmd->fd_out == -1)
+        return (set_cmd_error(OPEN_ERROR, cmd, "Failed to open output file"));
 }
+
 
 int	connect_pipes_and_exec(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode)
 {
@@ -96,16 +94,22 @@ int	connect_pipes_and_exec(t_shell *shell, t_tree *tree, int pipe_fd[2], int mod
 	exit (exit_code);
 }
 
-void	redirect_for_cmd(t_shell *shell, t_cmd *cmd)
+void    redirect_for_cmd(t_shell *shell, t_cmd *cmd)
 {
-	if (catch_error(shell))
-		return ;
-	set_infile_fd(shell, cmd);
-	set_outfile_fd(cmd);
-	if (cmd->exit_code)
-		return ;
-	if (cmd->fd_in != STDIN_FILENO && dup2(cmd->fd_in, STDIN_FILENO) == -1)
-		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting input"));
-	if (cmd->fd_out != STDOUT_FILENO && dup2(cmd->fd_in, STDOUT_FILENO) == -1)
-		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting output"));
+    if (catch_error(shell))
+        return ;
+    get_input_fd(shell, cmd);
+    get_output_fd(cmd);
+    if (cmd->exit_code)
+        return ;
+    if (cmd->fd_in != STDIN_FILENO && dup2(cmd->fd_in, STDIN_FILENO) == -1)
+    {
+        set_cmd_error(DUP_ERROR, cmd, "Error redirecting input");
+        return ;
+    }
+    if (cmd->fd_out != STDOUT_FILENO && dup2(cmd->fd_out, STDOUT_FILENO) == -1)
+    {
+        set_cmd_error(DUP_ERROR, cmd, "Error redirecting output");
+        return ;
+    }
 }

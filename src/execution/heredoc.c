@@ -6,54 +6,85 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:30 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:48:03 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/19 15:07:40 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*increment_char(t_shell *shell, char *string)
+char	*create_filepath(const char *base, int counter)
 {
-	size_t	len;
-	char	letter;
+	char	*counter_str;
+	char	*filepath;
 
-	if (!string)
+	counter_str = ft_itoa(counter);
+	if (!counter_str)
 		return (NULL);
-	letter = 'a';
-	len = ft_strlen(string);
-	if (len > ft_strlen(HEREDOC_LOC)
-		|| string[len - 1] != 'z' || string[len - 1] != 'Z')
-	{
-		string[len - 1] = string[len - 1] + 1;
-		return (string);
-	}
-	else if (len < 256)
-		return (ft_strjoinfree(string, &letter));
-	return (set_error(TOO_MANY_HEREDOC, shell,
-			"reached end of posible random name"), NULL);
+	filepath = ft_strjoin(base, counter_str);
+	free(counter_str);
+	return (filepath);
 }
 
 char	*generate_heredoc_filepath(t_shell *shell)
 {
-	char	*heredoc_path;
+	char		*base_name;
+	char		*heredoc_path;
+	int			counter;
+	time_t		timestamp;
 
-	heredoc_path = ft_strdup(HEREDOC_LOC);
-	while (1)
+	timestamp = time(NULL);
+	base_name = ft_strjoin(HEREDOC_LOC, ft_itoa((int)timestamp));
+	if (!base_name)
+		return (set_error(MALLOC_FAIL, shell, "Heredoc"), NULL);
+	counter = 0;
+	while (counter < 1000)
 	{
-		if (access(heredoc_path, F_OK) != 0)
-			break ;
-		heredoc_path = increment_char(shell, heredoc_path);
+		heredoc_path = create_filepath(base_name, counter);
 		if (!heredoc_path)
-			return (set_error(MALLOC_FAIL, shell, "Heredoc"), NULL);
+			return (free(base_name), set_error(MALLOC_FAIL, shell, "Heredoc"), NULL);
+		if (access(heredoc_path, F_OK) != 0)
+			return (free(base_name), heredoc_path);
+		free(heredoc_path);
+		counter++;
 	}
-	return (heredoc_path);
+	return (free(base_name), set_error(TOO_MANY_HEREDOC, shell, "Impossible de créer un fichier unique"), NULL);
 }
 
-void	assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node)
+
+void	display_heredoc_prompt(int index)
+{
+	char	*index_str;
+	char	*prompt;
+
+	index_str = ft_itoa(index);
+	if (!index_str)
+		return ;
+	prompt = ft_strjoinfree(index_str, " heredoc> ");
+	if (!prompt)
+		return ;
+	write(STDOUT_FILENO, prompt, ft_strlen(prompt));
+	free(prompt);
+}
+
+void	read_and_write_heredoc(t_file *file, t_cmd *cmd)
+{
+	char	*line;
+
+	while (1)
+	{
+		display_heredoc_prompt(cmd->cmd_index + 1);
+		line = get_next_line(STDIN_FILENO);
+		if (!line || ft_strncmp(file->delim, line, ft_strlen(file->delim)) == 0)
+			break ;
+		write(file->fd, line, ft_strlen(line));
+		free(line);
+	}
+	free(line);
+}
+
+void	manage_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node)
 {
 	t_file	*file;
-	char	*result;
-	char	*heredoc_index;
 
 	file = (t_file *)file_node->content;
 	if (file->mode != HEREDOC)
@@ -61,17 +92,10 @@ void	assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node)
 	open_file(file, cmd, WRITE);
 	if (file->fd < 0)
 		return (set_error(READ_ERROR, shell, "Unable to create heredoc"));
-	heredoc_index = ft_strjoinfree(ft_itoa(cmd->cmd_index + 1), " heredoc> ");
-	while (1)
-	{
-		write(STDIN_FILENO, heredoc_index, ft_strlen(heredoc_index));
-		result = get_next_line(STDIN_FILENO);
-		if (ft_strncmp(file->delim, result, ft_strlen(file->delim)) == 0)
-			break ;
-		write(file->fd, result, ft_strlen(result));
-	}
+	read_and_write_heredoc(file, cmd);
 	close(file->fd);
 }
+
 
 void	destroy_heredoc(t_shell *shell, t_list *file_node)
 {

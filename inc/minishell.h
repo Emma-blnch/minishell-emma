@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/13 10:56:04 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/19 16:07:12 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "/home/ahamini/Documents/test_minishell/inc/libft/inc/libft.h"
+# include "/home/akim/42/minishell/minishell/inc/libft/inc/libft.h"
 
 typedef struct s_token
 {
@@ -118,7 +118,7 @@ void		tokenize_special(char **input, t_list **tokens);
 /* HEREDOC */
 
 char		*generate_heredoc_filepath(t_shell *shell);
-void		assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
+void		manage_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
 void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 /* EXECUTION */
@@ -126,7 +126,7 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 int			exec_tree(t_shell *shell, t_tree *tree, bool piped);
 int			exec_pipe(t_shell *shell, t_tree *tree);
 int			exec_single_cmd(t_shell *shell, t_tree *tree, bool piped);
-int			create_fork(t_shell *shell, int	*fork_pid);
+int			create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		put_arg_in_array(t_cmd *cmd);
 
@@ -145,9 +145,8 @@ int			is_builtin(t_cmd *cmd);
 
 /* REDIRECTION */
 
-void		open_file(t_file *file, t_cmd *cmd, int mode);
+int		open_file(t_file *file, t_cmd *cmd, int mode);
 void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
-int			create_pipe(t_shell *shell, int *pipe_fd);
 int			connect_pipes_and_exec(t_shell *shell, t_tree *tree,
 				int pipe_fd[2], int mode);
 void		close_pipe(int *pipe_fd);
@@ -181,7 +180,7 @@ void		print_tokens(t_list *first);
 # define DELIMITERS		"'\"()"
 # define OPERATORS		"|><$"
 # define BLANKS	" \n\t"
-# define HEREDOC_LOC	"tmp/heredoc"
+# define HEREDOC_LOC	"tmp/heredoc_"
 # define SHELL_NAME		"shell"
 
 enum e_lexem
