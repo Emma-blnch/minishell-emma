@@ -6,13 +6,13 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:12 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:58:47 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 10:24:05 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_error(void)
+/*void	print_error(void)
 {
 	ft_putstr_fd(SHELL_NAME, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
@@ -49,4 +49,4 @@ void	set_error_if(int condition, int err_code, t_shell *shell,
 int	catch_error(t_shell *shell)
 {
 	return (shell->critical_er);
-}
+}*/

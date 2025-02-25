@@ -6,13 +6,13 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:46 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/19 16:06:04 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 10:43:51 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe)
+/*int create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe)
 {
     int result;
 
@@ -43,5 +43,5 @@ void	reset_std(t_shell *shell, bool piped)
 		return ;
 	dup2(shell->std_in, 0);
 	dup2(shell->std_out, 1);
-}
+}*/
 

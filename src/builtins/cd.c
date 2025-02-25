@@ -6,48 +6,87 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/11 10:46:41 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 12:56:53 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*extract_home(t_shell *shell)
+static int	count_arg(char **params)
 {
-	char	*path;
+	int	count;
 
-	while (shell->env_list)
-	{
-		path = (char *)shell->env_list->content;
-		if (ft_strncmp(path, "HOME=", 5) == 0)
-			return (&path[5]);
-		shell->env_list = shell->env_list->next;
-	}
-	return (NULL);
+	count = 0;
+	while (params[count])
+		count++;
+	return (count);
 }
 
-
-int	cd(t_shell *shell, char *path)
+static void	error_malloc(void)
 {
-	int	exit_code;
-
-	if (path == NULL)
-		path = extract_home(shell);
-	exit_code = chdir(path);
-	if (exit_code != 0)
-	{
-		print_error();
-		ft_putstr_fd("cd :", STDERR_FILENO);
-		ft_putstr_fd(path, STDERR_FILENO);
-		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-	}
-	return (exit_code);
+	print_error2(ERR_MALLOC);
+	return ;
 }
 
+static void	update_oldpwd(t_shell *shell)
+{
+	t_list	*tmp;
+	char	*test;
+	int		len;
 
-// cd sans argument renvoie vers le home
+	tmp = shell->env;
+	test = NULL;
+	len = len_list(tmp);
+	while (len--)
+	{
+		if (ft_strncmp(tmp->str, "PWD=", 3) == 0)
+			test = tmp->str;
+		tmp = tmp->next;
+	}
+	if (!test)
+		export2("OLDPWD", &shell->env);
+	if (test)
+	{
+		test = ft_strjoin("OLD", test);
+		if (!test)
+			return (error_malloc());
+		export(&test, &shell->env);
+	}
+	free(test);
+}
 
-// int cd(char *path)
-// {
-//     chdir(path);
-// }
+static void	update_pwd(t_shell *shell, char *param)
+{
+	char	cwd[PATH_MAX];
+	char	*pwd;
+
+	update_oldpwd(shell);
+	if (getcwd(cwd, PATH_MAX) == NULL)
+	{
+		perror(param);
+		return ;
+	}
+	pwd = ft_strjoin("PWD=", cwd);
+	if (!pwd)
+		return (error_malloc());
+	export(&pwd, &shell->env);
+	free(pwd);
+}
+
+int	cd(t_shell *shell, char **params)
+{
+	int	res;
+
+	if (count_arg(params) == 2)
+	{
+		res = chdir(params[1]);
+		if (res == 0)
+			update_pwd(shell, params[1]);
+		if (res == -1)
+			res *= -1;
+		if (res == 1)
+			perror(params[1]);
+		return (res);
+	}
+	return (1);
+}

@@ -6,16 +6,17 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:46:20 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/19 15:11:50 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 10:43:49 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	open_file(t_file *file, t_cmd *cmd, int mode)
+/*int	open_file(t_file *file, t_cmd *cmd, int mode)
 {
 	int	flags;
 
+    flags = 0;
 	if (mode == READ)
 		flags = O_RDONLY;
 	else if (mode == WRITE)
@@ -25,7 +26,7 @@ int	open_file(t_file *file, t_cmd *cmd, int mode)
 	file->fd = open(file->path, flags, 0666);
 	if (file->fd == -1)
 	{
-		set_cmd_error(OPEN_ERROR, cmd, "Error while opening file");
+		set_cmd_error(OPEN_ERROR, cmd, "Error trying to open the file");
 		return (-1);
 	}
 	return (file->fd);
@@ -112,4 +113,4 @@ void    redirect_for_cmd(t_shell *shell, t_cmd *cmd)
         set_cmd_error(DUP_ERROR, cmd, "Error redirecting output");
         return ;
     }
-}
+}*/

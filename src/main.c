@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:50:04 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:50:05 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 13:31:01 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,24 @@
 // 	return (0);
 // }
 
+pid_t	g_signal_pid;
+
 int	main(int argc, char **argv, char **envp)
 {
-	t_shell	*shell;
+	t_shell	shell;
 
 	(void)argc;
 	(void)argv;
-	shell = create_minishell(envp);
-	if (!shell)
-	{
-		write(2, "error: minishell creation failed\n", 32);
-		return (1);
-	}
-	init_readline(shell);
-	free_minishell(shell);
+	shell.env = NULL;
+	shell.token = NULL;
+	shell.cmd = NULL;
+	shell.exit_code = 0;
+	shell.pip[0] = -1;
+	shell.pip[1] = -1;
+	g_signal_pid = 0;
+	signals();
+	if (!create_minishell(&shell, envp))
+		free_all(&shell, ERR_MALLOC, EXT_MALLOC);
+	init_readline(&shell);
 	return (0);
 }

@@ -6,13 +6,13 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:21 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/19 17:05:43 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 11:13:00 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	exec_with_process(t_shell *shell, t_cmd *cmd)
+/*int	exec_with_process(t_shell *shell, t_cmd *cmd)
 {
 	if (cmd->exit_code)
 		return (cmd->exit_code);
@@ -26,7 +26,7 @@ int	exec_with_process(t_shell *shell, t_cmd *cmd)
 		get_cmd_path(shell, cmd);
 		if (!cmd->cmd_path)
 			exit(cmd->exit_code);
-		put_arg_in_array(cmd);
+		command_into_array(cmd);
 		if (!cmd->argv)
 			exit(cmd->exit_code);
 		execve(cmd->cmd_path, cmd->argv, shell->env);
@@ -36,9 +36,9 @@ int	exec_with_process(t_shell *shell, t_cmd *cmd)
 	return (cmd->exit_code);
 }
 
-int	exec_with_main(t_shell *shell, t_cmd *cmd, bool piped)
+int	exec_with_builtin(t_shell *shell, t_cmd *cmd, bool piped)
 {
-	put_arg_in_array(cmd);
+	command_into_array(cmd);
 	if (!cmd->argv)
 		return (cmd->exit_code);
 	redirect_for_cmd(shell, cmd);
@@ -49,7 +49,7 @@ int	exec_with_main(t_shell *shell, t_cmd *cmd, bool piped)
 	return (cmd->exit_code);
 }
 
-int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
+int	exec_one_cmd(t_shell *shell, t_tree *tree, bool piped)
 {
 	t_cmd	*cmd;
 
@@ -60,9 +60,9 @@ int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
 		reset_std(shell, piped);
 	}
 	else if (is_builtin(cmd))
-		exec_with_main(shell, cmd, piped);
+		exec_with_builtin(shell, cmd, piped);
 	else
-		exec_with_fork(shell, cmd);
+		exec_with_process(shell, cmd);
 	return (cmd->exit_code);
 }
 
@@ -93,19 +93,27 @@ int exec_pipe(t_shell *shell, t_tree *tree)
         }
     }
     return (PIPE_ERROR);
-}
+}*/
 
 
-int	exec_tree(t_shell *shell, t_tree *tree, bool piped)
+int	exec_tree(t_shell *shell)
 {
-	//int	exit_code;
+	t_cmd	*tmp;
+	int		*pip;
 
-	if (!tree)
-		return (set_error(SYNTAX_ERROR, shell, "Empty tree"), SYNTAX_ERROR);
-	if (tree->type == AST_PIPE)
+	pip = shell->pip;
+	tmp = shell->cmd;
+	printf("cmd_param:%s\n", tmp->cmd_param[0]);
+	if (tmp && tmp->skip_cmd == false && tmp->next == tmp && tmp->cmd_param[0] \
+		&& is_builtin(tmp->cmd_param[0]))
+		return (launch_builtin(shell, tmp));
+	if (pipe(pip) == -1)
+		return (false);
+	/*if (shell->type == AST_PIPE)
 	{
 		//printf("hello pipe\n");
-		return (exec_pipe(shell, tree));
+		return (exec_pipe(shell));
 	}
-	return (exec_single_cmd(shell, tree, piped));
+	return (exec_one_cmd(shell));*/
+	return (true);
 }

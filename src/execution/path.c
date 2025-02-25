@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:39 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:47:51 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 11:21:26 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,17 @@ int	extract_paths(t_shell *shell)
 	path = NULL;
 	shell->paths = NULL;
 	index = 0;
-	while (shell->env[index])
+	while (shell->envp[index])
 	{
-		if (ft_strncmp(shell->env[index], "PATH=", 5) == 0)
+		if (ft_strncmp(shell->envp[index], "PATH=", 5) == 0)
 		{
-			path = ft_substr(shell->env[index], 5,
-					ft_strlen(shell->env[index]));
+			path = ft_substr(shell->envp[index], 5,
+					ft_strlen(shell->envp[index]));
 			if (!path)
 			{
 				set_error_if(!path, MALLOC_FAIL, shell,
 					"Failed to allocate for path");
-				ft_free_tab(shell->env);
+				ft_free_tab(shell->envp);
 				return (-1);
 			}
 			shell->paths = ft_split(path, ':');
@@ -53,7 +53,7 @@ int	extract_paths(t_shell *shell)
 	return (0);
 }
 
-int	is_a_directory(char *path)
+/*int	is_a_directory(char *path)
 {
 	int	fd;
 
@@ -74,7 +74,6 @@ void	check_cmd(t_cmd *cmd)
 		return (set_cmd_error(CANT_EXECUTE_CMD, cmd, "Command cannot be executed"));
 }
 
-/* */
 void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 {
 	char	*tested_path;
@@ -96,18 +95,24 @@ void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 	cmd->cmd_path = NULL;
 }
 
-/* Checks first absolute path for command
-Then paths if any were extracted from env
-Exits fork if no command is found */
 void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 {
-	cmd->cmd_path = ft_strjoin("/", (char *)cmd->arg_list->content);
+	if (ft_strchr(cmd->arg_list->content, '/'))
+		cmd->cmd_path = ft_strdup(cmd->arg_list->content);
+	else
+		cmd->cmd_path = ft_strjoin("/", cmd->arg_list->content);
+	
 	if (!cmd->cmd_path)
 		return (set_cmd_error(MALLOC_FAIL, cmd, "Failed to allocate path"));
+	
 	if (access(cmd->cmd_path, F_OK) == 0)
 		return (check_cmd(cmd));
-	if (shell->paths == NULL)
+	
+	if (!shell->paths)
 		return (set_cmd_error(CANT_FIND_CMD, cmd, "No PATH variable found"));
+
 	find_accessible_path(shell, cmd);
-	return (check_cmd(cmd));
-}
+	check_cmd(cmd);
+}*/
+
+

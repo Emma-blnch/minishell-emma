@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 13:19:31 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/09 14:10:48 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/24 08:40:06 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 typedef struct s_list
 {
 	int				type;
+	char			*str;
 	char			*content;
 	struct s_list	*next;
 	struct s_list	*prev;

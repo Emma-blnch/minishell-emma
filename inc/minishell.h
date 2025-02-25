@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/19 17:05:52 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 13:26:26 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,231 +23,163 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <signal.h>
+# include <limits.h>
 # include <time.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "/home/akim/42/minishell/minishell/inc/libft/inc/libft.h"
+# include "/home/ahamini/Documents/minishell2/inc/libft/inc/libft.h"
+
+extern pid_t	g_signal_pid;
 
 typedef struct s_token
 {
-	int				lexem;		// type as determined by the lexer
-	char			letter;		// letter or first letter
-	char			*content;	// malloced words or letter
-}	t_token;
-
-typedef struct s_files
-{
-	int				mode;		// infile, outfile, heredoc or append
-	char			*path;		// pathfile
-	char			*delim;		// delimiter if heredoc, else NULL
-	int				fd;			// resulting fd once opened
-	bool			is_quoted;	// is a quote in delimiter, meaining expand
-}	t_file;
+	char			*str;
+	int				type;
+	struct s_token	*prev;
+	struct s_token	*next;
+}				t_token;
 
 typedef struct s_cmd
 {
-	char			**argv;		// array created with cmd_path, then arguments
-	char			*cmd_path;	// binary filepath, absolute/through PATH
-	t_list			*arg_list;	// linked list of command arguments
-	t_list			*infiles;	// linked list of input files
-	t_list			*outfiles;	// linked list of output files
-	int				fd_out;		// fd of the final output redirection
-	int				fd_in;		// fd of the final input redirection
-	int				exit_code;	// value returned by the execution of command
-	size_t			cmd_index;	// number of the command among other commands
-	int				fork_pid;	// process id of fork sent to execute command
-}	t_cmd;
-
-typedef struct s_ast
-{
-	int				type;		// either pipe, or, and or single cmd node
-	void			*content;	// may contain pointer to cmd structure
-	struct s_ast	*left;		// part of the cmd line left of the operator
-	struct s_ast	*right;		// part of the cmd line right of the operator
-}	t_tree;
+	bool			skip_cmd;
+	int				infile;
+	int				outfile;
+	char			**cmd_param;
+	size_t			cmd_index;
+	t_list			*infiles;
+	t_list			*outfiles;
+	struct s_cmd	*prev;
+	struct s_cmd	*next;
+}				t_cmd;
 
 typedef struct s_shell
 {
-	char		*cmd_line;		// readline return
-	t_list		*token_list;	// linked list of tokens id from cmd line
-	t_list		*cmd_list;		// linked list of commands as a structs
-	t_list		*env_list;		// linked list of env strings
-	t_tree		*tree_root;		// abstract syntaxic tree
-	int			pipe_fd[2][2];	// two pair of pipe fd for all pipe execution
-	size_t		cmd_count;		// total of commands in commmand line
-	size_t		index;			// index of command currently being executed
-	char		**env;			// env received at start of program
-	char		**paths;		// extracted PATH variable of the env
-	int			std_out;		// preserved stdout
-	int			std_in;			// preserved stdin
-	int			critical_er;	// flag if critical error in parent process
-	int			last_exit_code;	// result of the last command
-}	t_shell;
-
-/* SIGNAL */
-
-void		handle_siquit(int sig);
-void		signals(void);
+	t_list			*env;
+	t_token			*token;
+	t_cmd			*cmd;
+	int				exit_code;
+	int				pip[2];
+	int				std_in;
+	int				std_out;
+	bool			squote;
+	char			**paths;
+	char			**envp;
+}				t_shell;
 
 /* INPUT */
 
-void		parse_and_exec_cmd(t_shell *shell, char *input);
+bool		parse_cmd(t_shell *shell, char *input);
 void		extract_env_as_linked_list(t_shell *shell);
 int			extract_paths(t_shell *shell);
-void		init_readline(t_shell *shell);
+int			init_readline(t_shell *shell);
+bool		empty_input(char *line);
 
 /* PARSING */
 
-t_shell		*create_minishell(char **env);
-void		scan(t_shell *shell);
-void		add_token(t_shell *shell, int type, char letter);
-void		merge_token(t_shell *shell, t_list *start);
-void		lexer(t_shell *shell);
-int			check_syntax(t_shell *shell, t_list *token_list);
-t_tree		*create_branch(t_shell *shell, int type, void *content);
-t_cmd		*create_cmd(void);
-void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
-void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
-void		parser(t_shell *shell);
-t_list		*tokenizer(t_shell *shell, char *input);
-void		free_tokens(t_list *current);
-char		*ft_strndup(const char *src, int size);
-int			is_not_space(char c);
-void		tokenize_special(char **input, t_list **tokens);
-
+int			create_minishell(t_shell *shell, char **envp);
+bool		is_space(char c);
+int			open_quote(t_shell *shell, char *input);
+void		quoting_choice(bool *d_quote, bool *s_quote, int *index, char c);
+int			replace_dollar(char **line, t_shell *shell);
+int			add_char(char *c, char **str, t_shell *shell, int *index);
+int			add_dollar(char *line, int *index, char **str, t_shell *shell);
+char		*get_dollar_word(char *line, int size);
+char		*get_elem_env(t_list *env, char *key);
+int			exist_in_env(char *line, int *i, t_shell *shell);
+size_t		len_list(t_list *list);
+bool		create_list_token(t_token **begin, char *command);
+bool		create_list_cmd(t_shell *shell);
+bool		is_space(char c);
+int			is_special(char *str);
+int			append_token(t_token **list, char *str, int type);
+int			append_cmd(t_cmd **list, int infile, int outfile, char **cmd_param);
+bool		get_outfile(t_token *token, t_cmd *cmd, t_shell *shell);
+bool		get_infile(t_shell *shell, t_token *token, t_cmd *cmd);
+char		**get_param(t_shell *shell, t_token *token);
 
 /* HEREDOC */
 
-char		*generate_heredoc_filepath(t_shell *shell);
-void		manage_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
-void		destroy_heredoc(t_shell *shell, t_list *file_node);
+int	here_doc(t_shell *shell, char *word);
 
 /* EXECUTION */
 
-int			exec_tree(t_shell *shell, t_tree *tree, bool piped);
-int			exec_pipe(t_shell *shell, t_tree *tree);
-int			exec_single_cmd(t_shell *shell, t_tree *tree, bool piped);
-int			create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe);
-void		get_cmd_path(t_shell *shell, t_cmd *cmd);
-void		put_arg_in_array(t_cmd *cmd);
+int			exec_tree(t_shell *shell);
+int			append(t_list **list, char *elem);
+char		**lst_to_arr(t_list *env);
+//int			exec_pipe(t_shell *shell, t_tree *tree);
+//int			exec_one_cmd(t_shell *shell, t_tree *tree, bool piped);
+//int			create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe);
+//void		get_cmd_path(t_shell *shell, t_cmd *cmd);
+//void		command_into_array(t_cmd *cmd);
 
 /* BUILT IN */
 
-int			cd(t_shell *shell, char *path);
-int			echo(char **argv, int fdout);
-int			env(t_shell *shell, int fdout);
-int			export(t_shell *shell, char **argv, int fdout);
-int			unset(t_shell *shell, char **argv);
+int			cd(t_shell *shell, char **params);
+int			echo(char **argv);
+int			env(t_list *env);
+int			export(char **str, t_list **env);
+bool		export2(char *str, t_list **env);
+int			ft_unset(char **str, t_list **env);
 t_list		*find_env(t_list *env_list, char *env_name);
-int			pwd(int fdout);
-int			exit_shell(t_shell *shell, char **argv);
-int			exec_builtin(t_shell *shell, t_cmd *cmd);
-int			is_builtin(t_cmd *cmd);
+int			pwd(void);
+void		ft_exit(t_shell *shell, char **args);
+int			launch_builtin(t_shell *shell, t_cmd *cmd);
+int			is_builtin(char *cmd);
 
 /* REDIRECTION */
 
-int		open_file(t_file *file, t_cmd *cmd, int mode);
-void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
-int			connect_pipes_and_exec(t_shell *shell, t_tree *tree,
-				int pipe_fd[2], int mode);
-void		close_pipe(int *pipe_fd);
-void		set_infile_fd(t_shell *shell, t_cmd *cmd);
-void		set_outfile_fd(t_cmd *cmd);
-void		reset_std(t_shell *shell, bool piped);
+//static int	open_file(t_shell *shell, char *filename, int type);
+//void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
+//int			connect_pipes_and_exec(t_shell *shell, t_tree *tree,
+//				int pipe_fd[2], int mode);
+//void		close_pipe(int *pipe_fd);
+//void		set_infile_fd(t_shell *shell, t_cmd *cmd);
+//void		set_outfile_fd(t_cmd *cmd);
+//void		reset_std(t_shell *shell, bool piped);
 
 /* ERROR HANDLING */
 
 void		set_error_if(int cond, int err_code, t_shell *shell, char *message);
 void		set_error(int err_code, t_shell *shell, char *err_message);
 void		set_cmd_error(int err_code, t_cmd *cmd, char *err_message);
-int			catch_error(t_shell *shell);
 void		print_error(void);
+bool		print_error_token(t_token *token, t_shell *shell);
+bool		print_error2(char *str);
 
 /* CLEAN UP */
 
-void		free_token(void *token);
-void		free_cmd(void *cmd);
-void		free_file(void *file);
-void		free_tree(t_tree **tree);
-void		free_minishell(t_shell *shell);
-void		free_tab(char **tab);
+void		free_all(t_shell *shell, char *err, int ext);
+void		free_cmd(t_cmd **list);
+void		free_array(char **arr);
+void		free_token(t_token **list);
+int			free_list(t_list **list);
+
+/* SIGNALS */
+
+void	clear_rl_line(void);
+void	signals(void);
 
 /* DEBUG */
 
 void		print_tokens(t_list *first);
 
-# define TRUE			1
-# define FALSE			0
-# define DELIMITERS		"'\"()"
-# define OPERATORS		"|><$"
-# define BLANKS	" \n\t"
-# define HEREDOC_LOC	"tmp/heredoc_"
-# define SHELL_NAME		"shell"
+# define INPUT		1	//"<"
+# define HEREDOC	2	//"<<"
+# define TRUNC		3	//">"
+# define APPEND		4	//">>"
+# define PIPE		5	//"|"
+# define CMD		6	//"|"
+# define ARG		7	//"|"
+# define ENV		8
 
-enum e_lexem
-{
-	NONE		= 0,
-	WORD		= 1,
-	BLANK		= 2,
-	DELIMITER	= 3,
-	OPERATOR	= 4,
-	END			= 5,
-	START		= 6,
-	ENV			= 7,
-	APPENDS		= 8,
-	VARIABLE,
-	CMD,
-	OUTFILE,
-	INFILE,
-	HEREDOC,
-	APPEND,
-	STRING,
-	DOUB_QUOTE	= '"',
-	SING_QUOTE	= '\'',
-	PIPE		= '|',
-	GREATER		= '>',
-	LESSER		= '<',
-};
+# define ERR_MALLOC	"malloc error\n"
+# define ERR_PIPE	"pipe error\n"
+# define ERR_FORK	"fork error\n"
+# define SHELL_NAME	"shell"
 
-enum e_exit_code
-{
-	SUCCESS = 0,
-	MALLOC_FAIL = 1,
-	GENERAL_ERROR = 1,
-	PIPE_ERROR = 1,
-	FORK_ERROR = 1,
-	DUP_ERROR = 1,
-	NO_FILE = 1,
-	READ_ERROR = 1,
-	OPEN_ERROR = 1,
-	SYNTAX_ERROR = 1,
-	TOO_MANY_HEREDOC = 1,
-	CANT_EXECUTE_CMD = 126,
-	CANT_FIND_CMD = 127,
-};
-
-enum e_pipe_fd
-{
-	READ = 0,
-	WRITE = 1,
-};
-
-enum e_ast
-{
-	AST_PIPE,
-	AST_CMD,
-	AST_REDIRECTION,
-	AST_AND,
-	AST_OR,
-	AST_SUB,
-};
-
-enum e_tree_mode
-{
-	NO_PIPE,
-	IS_PIPE,
-	AST_LEFT,
-	AST_RIGHT,
-};
+# define EXT_MALLOC		1
+# define EXT_PIPE		1
+# define EXT_FORK		1
+# define MALLOC_FAIL	1
 
 #endif

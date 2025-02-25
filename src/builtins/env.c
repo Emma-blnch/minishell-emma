@@ -6,7 +6,7 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:20:08 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/13 10:55:41 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 11:59:25 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,24 +17,29 @@ void	extract_env_as_linked_list(t_shell *shell)
 	int		index;
 
 	index = 0;
-	while (shell->env[index])
+	while (shell->envp[index])
 	{
-		ft_lstadd_back(&shell->env_list,
-			ft_lstnew(ft_strdup(shell->env[index])),ENV);
+		ft_lstadd_back(&shell->env,
+			ft_lstnew(ft_strdup(shell->envp[index])),ENV);
 		index++;
 	}
 }
 
-int	env(t_shell *shell, int fdout)
+int	env(t_list *env)
 {
-	t_list	*current;
+	t_list	*temp;
 
-	current = shell->env_list;
-	while (current != NULL)
+	temp = env;
+	if (!temp)
+		return (0);
+	if (ft_strchr(temp->str, '='))
+		printf("%s\n", temp->str);
+	temp = temp->next;
+	while (temp != env)
 	{
-		ft_putstr_fd((char *)current->content, fdout);
-		write(fdout, "\n", 1);
-		current = current->next;
+		if (ft_strchr(temp->str, '='))
+			printf("%s\n", temp->str);
+		temp = temp->next;
 	}
 	return (0);
 }

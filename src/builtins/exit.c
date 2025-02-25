@@ -6,53 +6,63 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:20:16 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/11 10:45:44 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 12:58:58 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	string_is_only_digit(char *str)
+static int	almost_atoi(char *str, int *err)
 {
-	int	i;
+	unsigned long long	ret;
+	int					i;
+	int					j;
+	int					pn;
 
 	i = 0;
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
+	while ((9 <= str[i] && str[i] <= 13) || str[i] == 32)
 		i++;
-	}
-	return (1);
+	pn = 1;
+	if (str[i] == '+' || str[i] == '-')
+		if (str[i++] == '-')
+			pn = -1;
+	j = i;
+	ret = 0;
+	while ('0' <= str[i] && str[i] <= '9')
+		ret = ret * 10 + (str[i++] - 48);
+	while ((9 <= str[i] && str[i] <= 13) || str[i] == 32)
+		i++;
+	if (str[i] || i - j > 20 || ((pn == -1 && (ret - 1) > LONG_MAX) || \
+		(pn == 1 && (ret > LONG_MAX))))
+		*err = 1;
+	return ((int)((ret * pn) % 256));
 }
 
-/* Exit with first argument as exit code
-Bash documentation points out arg higher than 255 is undefined
-Here supports up to int max, then throws syntax error */
-int	exit_shell(t_shell *shell, char **argv)
+void	ft_exit(t_shell *shell, char **args)
 {
-	int	exit_code;
-	int	i;
+	int	ret;
+	int	err;
 
-	i = 1;
-	if (argv[i])
+	ret = 0;
+	err = 0;
+	if (args[1])
 	{
-		if (argv[i + 1])
+		ret = almost_atoi(args[1], &err);
+		if (err)
 		{
-			print_error();
-			ft_putstr_fd("exit: Too many arguments\n", STDERR_FILENO);
+			print_error2("exit: ");
+			print_error2(args[1]);
+			print_error2(": numeric argument required\n");
+			free_all(shell, NULL, 2);
 		}
-		if (!string_is_only_digit(argv[i]) || is_too_long_for_int(argv[i]))
-		{
-			print_error();
-			ft_putstr_fd("exit: Requires numerical arguments\n", STDERR_FILENO);
-		}
-		exit_code = ft_atoi(argv[i]);
-		while (exit_code > 255)
-			exit_code -= 255;
 	}
-	else
-		exit_code = shell->last_exit_code;
-	free_minishell(shell);
-	exit(exit_code);
+	if (args[1] && args[2])
+	{
+		print_error2("exit: too many arguments\n");
+		shell->exit_code = 1;
+		return ;
+	}
+	if (!args[1])
+		free_all(shell, NULL, shell->exit_code);
+	free_all(shell, NULL, ret);
 }

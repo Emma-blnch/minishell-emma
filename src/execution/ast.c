@@ -6,13 +6,13 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:47:00 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:58:49 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 10:24:31 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_tree	*create_branch(t_shell *shell, int type, void *content)
+/*t_tree	*create_branch(t_shell *shell, int type, void *content)
 {
 	t_tree	*node;
 
@@ -26,7 +26,7 @@ t_tree	*create_branch(t_shell *shell, int type, void *content)
 	return (node);
 }
 
-void	put_arg_in_array(t_cmd *cmd)
+void	command_into_array(t_cmd *cmd)
 {
 	int	argc;
 	int	index;
@@ -42,4 +42,4 @@ void	put_arg_in_array(t_cmd *cmd)
 		cmd->arg_list = cmd->arg_list->next;
 		index++;
 	}
-}
+}*/

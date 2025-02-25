@@ -6,58 +6,64 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:46:35 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/13 11:58:41 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 13:09:51 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_builtin(t_cmd *cmd)
+static void	exec_builtin(int save_stdout, t_shell *shell, t_cmd *cmd)
 {
-	char	*argv0;
-	t_list	*arg = cmd->arg_list;
-
-	while (arg)
+	if (!ft_strncmp("echo", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = echo(cmd->cmd_param);
+	else if (!ft_strncmp("cd", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = cd(shell, cmd->cmd_param);
+	else if (!ft_strncmp("pwd", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = pwd();
+	else if (!ft_strncmp("export", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = export(cmd->cmd_param, &shell->env);
+	else if (!ft_strncmp("unset", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = ft_unset(cmd->cmd_param, &shell->env);
+	else if (!ft_strncmp("env", cmd->cmd_param[0], INT_MAX))
+		shell->exit_code = env(shell->env);
+	else if (!ft_strncmp("exit", cmd->cmd_param[0], INT_MAX))
 	{
-		printf("arg: %s\n", (char *)arg->content);  // Affiche chaque argument
-        arg = arg->next;
+		if (cmd->outfile >= 0)
+		{
+			dup2(save_stdout, 1);
+			close(save_stdout);
+		}
+		ft_exit(shell, cmd->cmd_param);
 	}
-	if (!cmd || !cmd->arg_list)
-		return (0);
-	argv0 = (char *)cmd->arg_list->content;
-	if (ft_strcmp(argv0, "cd") == 0)
-		return (1);
-	//printf("arg: %s\n", argv0);
-	if (ft_strcmp(argv0, "echo") == 0)
-		return (1);
-	if (ft_strcmp(argv0, "env") == 0)
-		return (1);
-	if (ft_strcmp(argv0, "export") == 0)
-		return (1);
-	if (ft_strcmp(argv0, "unset") == 0)
-		return (1);
-	if (ft_strcmp(argv0, "pwd") == 0)
-		return (1);
-	if (ft_strcmp(argv0, "exit") == 0)
-		return (1);
-	return (0);
 }
 
-int	exec_builtin(t_shell *shell, t_cmd *cmd)
+int	launch_builtin(t_shell *shell, t_cmd *cmd)
 {
-	if (ft_strcmp(cmd->argv[0], "cd") == 0)
-		return (cd(shell, cmd->argv[1]));
-	if (ft_strcmp(cmd->argv[0], "echo") == 0)
-		return (echo(cmd->argv, cmd->fd_out));
-	if (ft_strcmp(cmd->argv[0], "env") == 0)
-            return (env(shell, cmd->fd_out));
-	if (ft_strcmp(cmd->argv[0], "export") == 0)
-		return (export(shell, cmd->argv, cmd->fd_out));
-	if (ft_strcmp(cmd->argv[0], "unset") == 0)
-		return (unset(shell, cmd->argv));
-	if (ft_strcmp(cmd->argv[0], "pwd") == 0)
-		return (pwd(cmd->fd_out));
-	else
-		exit_shell(shell, cmd->argv);
-	return (1);
+	int	save_stdout;
+
+	save_stdout = -1;
+	if (cmd->outfile >= 0)
+	{
+		save_stdout = dup(1);
+		dup2(cmd->outfile, 1);
+	}
+	exec_builtin(save_stdout, shell, cmd);
+	if (cmd->outfile >= 0)
+	{
+		dup2(save_stdout, 1);
+		close (save_stdout);
+	}
+	return (true);
 }
+int	is_builtin(char *cmd)
+{
+	if (!cmd)
+		return (false);
+	if (!ft_strncmp("echo", cmd, INT_MAX) || !ft_strncmp("cd", cmd, INT_MAX) \
+	|| !ft_strncmp("pwd", cmd, INT_MAX) || !ft_strncmp("export", cmd, INT_MAX) \
+	|| !ft_strncmp("unset", cmd, INT_MAX) || !ft_strncmp("env", cmd, INT_MAX) \
+	|| !ft_strncmp("exit", cmd, INT_MAX))
+		return (true);
+	return (false);
+}
+

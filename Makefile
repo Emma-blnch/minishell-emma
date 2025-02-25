@@ -6,7 +6,7 @@
 #    By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: Invalid date        by                   #+#    #+#              #
-#    Updated: 2025/02/10 09:21:56 by ahamini          ###   ########.fr        #
+#    Updated: 2025/02/24 13:32:21 by ahamini          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,22 +40,27 @@ FUNC_EXEC	= 	execution.c \
 				errors.c \
 				ast.c
 
-FUNC_PARS	=	tokenizer.c \
-				token.c \
-				tokens.c \
-				parser.c \
+				
+FUNC_PARS	=	cleanup.c \
+				cmd_fd.c \
+				cmd_utils.c \
+				dollar_utils.c \
+				errors.c \
+				errors2.c \
+				manage_dollar.c \
+				parse_cmd.c \
+				quote.c \
 				readline.c \
-				lexer.c \
 				signals.c \
-				syntax.c \
-				cleanup.c \
-				scanner.c
+				token_utils.c \
+				token.c
 
 FUNC_BUTI	=	cd.c \
 				echo.c \
 				env.c \
 				exit.c \
 				export.c \
+				export_utils.c \
 				pwd.c \
 				unset.c \
 				builtins.c

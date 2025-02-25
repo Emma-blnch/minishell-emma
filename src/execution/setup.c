@@ -6,82 +6,80 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:48:17 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/11 10:48:20 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 12:39:51 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	increment_all_cmd_index(t_list *start)
+static int	list_new_elem_str(t_list **new, char *elem)
 {
-	t_list	*current;
-	t_cmd	*curr_cmd;
-
-	current = start;
-	while (current != NULL)
-	{
-		curr_cmd = ((t_cmd *)current->content);
-		curr_cmd->cmd_index++;
-		current = current->next;
-	}
+	(*new) = malloc(sizeof(t_list));
+	if (*new == NULL)
+		return (0);
+	(*new)->str = elem;
+	(*new)->next = NULL;
+	(*new)->prev = NULL;
+	return (1);
 }
 
-t_cmd	*create_cmd(void)
+static void	add_first(t_list **list, t_list *new)
 {
-	t_cmd	*cmd;
-
-	cmd = (t_cmd *)ft_calloc(sizeof(t_cmd), 1);
-	if (!cmd)
-		return (NULL);
-	cmd->fork_pid = -1;
-	cmd->fd_in = -1;
-	cmd->fd_out = -1;
-	return (cmd);
+	(*list) = new;
+	(*list)->prev = *list;
+	(*list)->next = *list;
 }
 
-void	create_file(t_shell *shell, t_cmd *cmd, t_token *token)
+int	append(t_list **list, char *elem)
 {
-	t_file	*file;
-	t_list	*node;
+	t_list	*new;
 
-	file = (t_file *)ft_calloc(sizeof(t_file), 1);
-	if (!file)
-		return (set_error(MALLOC_FAIL, shell, "Failed to allocate filename"));
-	file->mode = token->lexem;
-	file->path = ft_strdup(token->content);
-	if (!file->path)
-		return (set_error(MALLOC_FAIL, shell, "Failed to allocate filename"));
-	node = ft_lstnew(file);
-	if (!node)
-		return (set_error(MALLOC_FAIL, shell, "Failed to alloc file node"));
-	if (file->mode == HEREDOC)
+	if (!list_new_elem_str(&new, elem))
+		return (0);
+	if (!(*list))
+		add_first(list, new);
+	else
 	{
-		file->delim = file->path;
-		file->path = generate_heredoc_filepath(shell);
-		if (!file->path)
-			return (set_error(MALLOC_FAIL, shell, "Failed hered generation"));
+		new->prev = (*list)->prev;
+		new->next = (*list);
+		(*list)->prev->next = new;
+		(*list)->prev = new;
 	}
-	if (file->mode == INFILE || file->mode == HEREDOC)
-		ft_lstadd_back(&cmd->infiles, node, 0);
-	if (file->mode == OUTFILE || file->mode == APPEND)
-		ft_lstadd_back(&cmd->outfiles, node, 0);
+	return (1);
 }
 
-t_shell	*create_minishell(char **env)
+bool	make_env(t_shell *shell)
 {
-	t_shell	*shell;
+	char	path[PATH_MAX];
+	char	*tmp;
 
-	shell = ft_calloc(sizeof(t_shell), 1);
-	if (!shell)
-		return (NULL);
-	shell->env = env;
-	if (extract_paths(shell) == -1)
+	tmp = ft_strdup("OLDPWD");
+	if (!tmp || !append(&(shell->env), tmp) || getcwd(path, PATH_MAX) == NULL)
+		free_all(shell, ERR_MALLOC, EXT_MALLOC);
+	tmp = ft_strjoin("PWD=", path);
+	if (!tmp || !append(&(shell->env), tmp))
+		free_all(shell, ERR_MALLOC, EXT_MALLOC);
+	return (1);
+}
+
+int	create_minishell(t_shell *shell, char **env)
+{
+	t_list	*list;
+	int		i;
+	char	*tmp;
+
+	if (!(*env))
+		return (make_env(shell));
+	i = -1;
+	list = NULL;
+	while (env[++i])
 	{
-		free(shell);
-		return (NULL);
+		tmp = ft_strdup(env[i]);
+		if (!tmp)
+			return (free_list(&list));
+		if (!append(&list, tmp))
+			return (free_list(&list));
 	}
-	dup2(STDOUT_FILENO, shell->std_out);
-	dup2(STDIN_FILENO, shell->std_in);
-	extract_env_as_linked_list(shell);
-	return (shell);
+	shell->env = list;
+	return (1);
 }

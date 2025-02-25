@@ -6,48 +6,44 @@
 /*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/28 10:35:17 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/24 08:57:03 by ahamini          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	handle_sigint(int sig)
+void	clear_rl_line(void)
 {
-	printf("\n");
-	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_redisplay();
-	(void)sig;
+	rl_on_new_line();
 }
 
-void	handle_siquit(int sig)
+static void	handle_sigint(int code)
 {
-	(void)sig;
+	(void)code;
+	printf("\n");
+	clear_rl_line();
+	if (g_signal_pid == 0)
+		rl_redisplay();
+}
+
+static void	handle_sigsegv(int code)
+{
+	(void)code;
+	write(2, "Segmentation fault\n", 19);
+	exit(11);
+}
+
+static void	handle_sigabrt(int code)
+{
+	(void)code;
+	write(1, "abort\n", 6);
 }
 
 void	signals(void)
 {
 	signal(SIGINT, &handle_sigint);
-	signal(SIGQUIT, &handle_siquit);
-	signal(SIGTSTP, SIG_IGN);
+	signal(SIGSEGV, &handle_sigsegv);
+	signal(SIGABRT, &handle_sigabrt);
+	signal(SIGQUIT, SIG_IGN);
 }
-
-/*int main(void)
-{
-	char *infile;
-	signals();
-	while(1)
-	{
-		infile = readline("shell>");
-		if(!infile)
-		{
-			write(1, "exit\n", 5);
-			break;
-		}
-		if(*infile)
-			add_history(infile);
-		free(infile);
-	}
-	return(0);
-}*/
