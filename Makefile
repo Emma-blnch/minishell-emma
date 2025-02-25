@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+         #
+#    By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: Invalid date        by                   #+#    #+#              #
-#    Updated: 2025/02/24 13:32:21 by ahamini          ###   ########.fr        #
+#    Updated: 2025/02/25 16:22:19 by ema_blnch        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,8 @@
 # **************************************************************************** #
 
 NAME		= minishell
+
+MAKEFLAGS += --no-print-directory
 
 DIR_SRC		= src
 DIR_EXEC	= execution

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/24 13:26:26 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/25 16:19:07 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include <time.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "/home/ahamini/Documents/minishell2/inc/libft/inc/libft.h"
+# include "libft/inc/libft.h"
 
 extern pid_t	g_signal_pid;
 
@@ -158,6 +158,7 @@ int			free_list(t_list **list);
 
 void	clear_rl_line(void);
 void	signals(void);
+void	handle_sigtstp(int code);
 
 /* DEBUG */
 

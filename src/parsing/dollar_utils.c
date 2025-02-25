@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dollar_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 09:21:55 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/24 09:24:52 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/25 16:11:30 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,13 @@ static int	end_word(char *str, char *env)
 	i = 0;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		++i;
+	if (ft_search(env, '=') == -1)
+		return (i);
 	if (i == ft_search(env, '='))
 		return (i);
 	return (0);
 }
 
-/* return 1 si $VAR dans env sinon 0 */
 int	exist_in_env(char *line, int *i, t_shell *shell)
 {
 	t_list	*tmp;

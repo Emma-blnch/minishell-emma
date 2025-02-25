@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/20 10:20:10 by mkling            #+#    #+#              #
-#    Updated: 2024/12/13 15:12:02 by mkling           ###   ########.fr        #
+#    Updated: 2025/02/25 16:22:06 by ema_blnch        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,9 @@ OBJ_DIR = obj
 
 INC_DIR = inc
 
+# Flags
+MAKEFLAGS += --no-print-directory
+$(VERBOSE).SILENT:
 
 # Files
 SRCS 	= ft_atoi.c ft_bubble_sort.c ft_calloc.c ft_free_tab.c ft_isalnum.c \

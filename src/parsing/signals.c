@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/24 08:57:03 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/25 16:15:01 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,5 @@ void	signals(void)
 	signal(SIGSEGV, &handle_sigsegv);
 	signal(SIGABRT, &handle_sigabrt);
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, &handle_sigtstp);
 }

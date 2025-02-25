@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   manage_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 09:15:25 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/24 09:23:37 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/25 16:13:46 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ static int	in_env(t_shell *shell, char *line, int size, char **str)
 
 	key = get_dollar_word(line, size);
 	value = get_elem_env(shell->env, key);
+	if (!value)
+		value = ft_strdup("");
 	if (key)
 		free(key);
 	tmp = ft_strjoin(*str, value);
@@ -65,10 +67,10 @@ int	add_dollar(char *line, int *index, char **str, t_shell *shell)
 	}
 	else
 	{
-		++(*index);
-		while (line[*index] && \
-			(ft_isalnum(line[*index]) || line[*index] == '_'))
-			++(*index);
+		// ++(*index);
+		// while (line[*index] && \
+		// 	(ft_isalnum(line[*index]) || line[*index] == '_'))
+		// 	++(*index);
 		return (1);
 	}
 }
