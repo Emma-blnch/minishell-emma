@@ -6,7 +6,7 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:50:04 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/26 10:36:49 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/26 11:37:41 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,5 +85,6 @@ int	main(int argc, char **argv, char **envp)
 	if (!create_minishell(&shell, envp))
 		free_all(&shell, ERR_MALLOC, EXT_MALLOC);
 	init_readline(&shell);
+	free_all(&shell, NULL, -1);
 	return (0);
 }

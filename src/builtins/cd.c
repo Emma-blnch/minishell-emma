@@ -6,7 +6,7 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/26 10:43:21 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/26 11:31:14 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,32 +28,48 @@ static void	error_malloc(void)
 	return ;
 }
 
+// static void	update_oldpwd(t_shell *data)
+// {
+// 	t_list	*tmp;
+// 	char	*test;
+// 	int		len;
+
+// 	tmp = data->env;
+// 	test = NULL;
+// 	len = len_list(tmp);
+// 	while (len--)
+// 	{
+// 		if (ft_strncmp(tmp->str, "PWD=", 3) == 0)
+// 			test = tmp->str;
+// 		tmp = tmp->next;
+// 	}
+// 	if (!test)
+// 		export2("OLDPWD", &data->env);
+// 	if (test)
+// 	{
+// 		test = ft_strjoin("OLD", test);
+// 		if (!test)
+// 			return (error_malloc());
+// 		export2(test, &data->env);
+// 	}
+// 	free(test);
+// }
 static void	update_oldpwd(t_shell *data)
 {
 	t_list	*tmp;
-	char	*test;
-	int		len;
+	char	cwd[PATH_MAX];
+	char	*oldpwd;
 
 	tmp = data->env;
-	test = NULL;
-	len = len_list(tmp);
-	while (len--)
-	{
-		if (ft_strncmp(tmp->str, "PWD=", 3) == 0)
-			test = tmp->str;
-		tmp = tmp->next;
-	}
-	if (!test)
-		export2("OLDPWD", &data->env);
-	if (test)
-	{
-		test = ft_strjoin("OLD", test);
-		if (!test)
-			return (error_malloc());
-		export2(test, &data->env);
-	}
-	free(test);
+	if (getcwd(cwd, PATH_MAX) == NULL)
+		return ;
+	oldpwd = ft_strjoin("OLDPWD=", cwd);
+	if (!oldpwd)
+		return (error_malloc());
+	export2(oldpwd, &data->env);
+	free(oldpwd);
 }
+
 
 static void	update_pwd(t_shell *data, char *param)
 {
@@ -73,19 +89,56 @@ static void	update_pwd(t_shell *data, char *param)
 	free(pwd);
 }
 
+// int	cd(t_shell *data, char **params)
+// {
+// 	int	res;
+// 	char	*path;
+
+// 	if (count_arg(params) == 2)
+// 	{
+// 		res = chdir(params[1]);
+// 		if (res == 0)
+// 			update_pwd(data, params[1]);
+// 		if (res == -1)
+// 			res *= -1;
+// 		if (res == 1)
+// 			perror(params[1]);
+// 		return (res);
+// 	}
+// 	return (1);
+// }
+
 int	cd(t_shell *data, char **params)
 {
-	int	res;
+	int		res;
+	char	*path;
+	bool	allocated;
 
-	if (count_arg(params) == 2)
+	path = NULL;
+	allocated = false;
+	if (count_arg(params) == 1 || (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2))) //Cas `cd` ou `cd ~` : aller à `$HOME`
 	{
-		res = chdir(params[1]);
+		path = get_elem_env(data->env, "HOME");
+		if (!path)
+		{
+			printf("cd: HOME not set\n");
+			return (1);
+		}
+		allocated = true;
+	}
+	else if (count_arg(params) == 2)
+		path = params[1];
+	if (path != NULL)
+	{
+		res = chdir(path);
 		if (res == 0)
-			update_pwd(data, params[1]);
+			update_pwd(data, path);
 		if (res == -1)
 			res *= -1;
 		if (res == 1)
-			perror(params[1]);
+			perror(path);
+		if (allocated)
+			free(path);
 		return (res);
 	}
 	return (1);
