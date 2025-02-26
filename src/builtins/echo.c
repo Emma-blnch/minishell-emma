@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:21 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/24 11:47:30 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/26 10:44:02 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,3 @@ int	echo(char **args)
 	write_echo(count, i, new_line, args);
 	return (0);
 }
-
-
-

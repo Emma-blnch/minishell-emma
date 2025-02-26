@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:57 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/24 13:09:12 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/26 10:44:02 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,4 +108,3 @@ int	ft_unset(char **str, t_list **env)
 	}
 	return (exit_code);
 }
-

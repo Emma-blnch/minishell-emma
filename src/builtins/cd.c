@@ -6,7 +6,7 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/26 10:23:32 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/26 10:43:21 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ static void	error_malloc(void)
 	return ;
 }
 
-static void	update_oldpwd(t_shell *shell)
+static void	update_oldpwd(t_shell *data)
 {
 	t_list	*tmp;
 	char	*test;
 	int		len;
 
-	tmp = shell->env;
+	tmp = data->env;
 	test = NULL;
 	len = len_list(tmp);
 	while (len--)
@@ -44,23 +44,23 @@ static void	update_oldpwd(t_shell *shell)
 		tmp = tmp->next;
 	}
 	if (!test)
-		export2("OLDPWD", &shell->env);
+		export2("OLDPWD", &data->env);
 	if (test)
 	{
 		test = ft_strjoin("OLD", test);
 		if (!test)
 			return (error_malloc());
-		export(&test, &shell->env);
+		export2(test, &data->env);
 	}
 	free(test);
 }
 
-static void	update_pwd(t_shell *shell, char *param)
+static void	update_pwd(t_shell *data, char *param)
 {
 	char	cwd[PATH_MAX];
 	char	*pwd;
 
-	update_oldpwd(shell);
+	update_oldpwd(data);
 	if (getcwd(cwd, PATH_MAX) == NULL)
 	{
 		perror(param);
@@ -69,11 +69,11 @@ static void	update_pwd(t_shell *shell, char *param)
 	pwd = ft_strjoin("PWD=", cwd);
 	if (!pwd)
 		return (error_malloc());
-	export(&pwd, &shell->env);
+	export2(pwd, &data->env);
 	free(pwd);
 }
 
-int	cd(t_shell *shell, char **params)
+int	cd(t_shell *data, char **params)
 {
 	int	res;
 
@@ -81,7 +81,7 @@ int	cd(t_shell *shell, char **params)
 	{
 		res = chdir(params[1]);
 		if (res == 0)
-			update_pwd(shell, params[1]);
+			update_pwd(data, params[1]);
 		if (res == -1)
 			res *= -1;
 		if (res == 1)

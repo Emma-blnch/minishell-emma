@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:20:16 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/24 12:58:58 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/26 10:44:02 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static int	almost_atoi(char *str, int *err)
 	return ((int)((ret * pn) % 256));
 }
 
-void	ft_exit(t_shell *shell, char **args)
+void	ft_exit(t_shell *data, char **args)
 {
 	int	ret;
 	int	err;
@@ -53,16 +53,16 @@ void	ft_exit(t_shell *shell, char **args)
 			print_error2("exit: ");
 			print_error2(args[1]);
 			print_error2(": numeric argument required\n");
-			free_all(shell, NULL, 2);
+			free_all(data, NULL, 2);
 		}
 	}
 	if (args[1] && args[2])
 	{
 		print_error2("exit: too many arguments\n");
-		shell->exit_code = 1;
+		data->exit_code = 1;
 		return ;
 	}
 	if (!args[1])
-		free_all(shell, NULL, shell->exit_code);
-	free_all(shell, NULL, ret);
+		free_all(data, NULL, data->exit_code);
+	free_all(data, NULL, ret);
 }
