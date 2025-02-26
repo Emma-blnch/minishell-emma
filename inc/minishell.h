@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/25 16:19:07 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/26 09:17:17 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,32 @@
 # include <stdbool.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <signal.h>
 # include <limits.h>
 # include <time.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/inc/libft.h"
+
+# define INPUT		1	//"<"
+# define HEREDOC	2	//"<<"
+# define TRUNC		3	//">"
+# define APPEND		4	//">>"
+# define PIPE		5	//"|"
+# define CMD		6	//"|"
+# define ARG		7	//"|"
+# define ENV		8
+
+# define ERR_MALLOC	"malloc error\n"
+# define ERR_PIPE	"pipe error\n"
+# define ERR_FORK	"fork error\n"
+# define SHELL_NAME	"shell"
+
+# define EXT_MALLOC		1
+# define EXT_PIPE		1
+# define EXT_FORK		1
+# define MALLOC_FAIL	1
 
 extern pid_t	g_signal_pid;
 
@@ -45,12 +65,19 @@ typedef struct s_cmd
 	int				infile;
 	int				outfile;
 	char			**cmd_param;
-	size_t			cmd_index;
-	t_list			*infiles;
-	t_list			*outfiles;
+	// size_t			cmd_index;
+	// t_list			*infiles;
+	// t_list			*outfiles;
 	struct s_cmd	*prev;
 	struct s_cmd	*next;
 }				t_cmd;
+
+typedef struct s_lists
+{
+	char			*str;
+	struct s_lists	*prev;
+	struct s_lists	*next;
+}					t_lists;
 
 typedef struct s_shell
 {
@@ -59,11 +86,11 @@ typedef struct s_shell
 	t_cmd			*cmd;
 	int				exit_code;
 	int				pip[2];
-	int				std_in;
-	int				std_out;
+	// int				std_in;
+	// int				std_out;
 	bool			squote;
-	char			**paths;
-	char			**envp;
+	// char			**paths;
+	// char			**envp;
 }				t_shell;
 
 /* INPUT */
@@ -111,6 +138,14 @@ char		**lst_to_arr(t_list *env);
 //int			create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe);
 //void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 //void		command_into_array(t_cmd *cmd);
+bool	exec(t_shell *data);
+void	child_process(t_shell *data, t_cmd *cmd, int *pip);
+char	*find_cmd(t_shell *data, char *sample, t_list *env);
+int	ft_strslashjoin(char *dest, char *str, char *env, int *index);
+int	here_doc(t_shell *data, char *word);
+size_t	len_cmd(t_cmd *list);
+void	absolute_path(char **path, char *cmd, t_shell *data);
+void	sort_array(char **arr, int len);
 
 /* BUILT IN */
 
@@ -123,8 +158,8 @@ int			ft_unset(char **str, t_list **env);
 t_list		*find_env(t_list *env_list, char *env_name);
 int			pwd(void);
 void		ft_exit(t_shell *shell, char **args);
-int			launch_builtin(t_shell *shell, t_cmd *cmd);
-int			is_builtin(char *cmd);
+bool			launch_builtin(t_shell *shell, t_cmd *cmd);
+bool		is_builtin(char *cmd);
 
 /* REDIRECTION */
 
@@ -159,28 +194,10 @@ int			free_list(t_list **list);
 void	clear_rl_line(void);
 void	signals(void);
 void	handle_sigtstp(int code);
+void	signals2(void);
 
 /* DEBUG */
 
 void		print_tokens(t_list *first);
-
-# define INPUT		1	//"<"
-# define HEREDOC	2	//"<<"
-# define TRUNC		3	//">"
-# define APPEND		4	//">>"
-# define PIPE		5	//"|"
-# define CMD		6	//"|"
-# define ARG		7	//"|"
-# define ENV		8
-
-# define ERR_MALLOC	"malloc error\n"
-# define ERR_PIPE	"pipe error\n"
-# define ERR_FORK	"fork error\n"
-# define SHELL_NAME	"shell"
-
-# define EXT_MALLOC		1
-# define EXT_PIPE		1
-# define EXT_FORK		1
-# define MALLOC_FAIL	1
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:50:04 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/24 13:31:01 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/26 08:59:57 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,42 @@
 // }
 
 pid_t	g_signal_pid;
+
+bool	make_env(t_shell *shell)
+{
+	char	path[PATH_MAX];
+	char	*tmp;
+
+	tmp = ft_strdup("OLDPWD");
+	if (!tmp || !append(&(shell->env), tmp) || getcwd(path, PATH_MAX) == NULL)
+		free_all(shell, ERR_MALLOC, EXT_MALLOC);
+	tmp = ft_strjoin("PWD=", path);
+	if (!tmp || !append(&(shell->env), tmp))
+		free_all(shell, ERR_MALLOC, EXT_MALLOC);
+	return (1);
+}
+
+int	create_minishell(t_shell *shell, char **env)
+{
+	t_list	*list;
+	int		i;
+	char	*tmp;
+
+	if (!(*env))
+		return (make_env(shell));
+	i = -1;
+	list = NULL;
+	while (env[++i])
+	{
+		tmp = ft_strdup(env[i]);
+		if (!tmp)
+			return (free_list(&list));
+		if (!append(&list, tmp))
+			return (free_list(&list));
+	}
+	shell->env = list;
+	return (1);
+}
 
 int	main(int argc, char **argv, char **envp)
 {

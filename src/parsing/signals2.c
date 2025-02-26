@@ -19,3 +19,8 @@ void	handle_sigtstp(int code)
 		rl_redisplay();
 	} 
 }
+
+void	signals2(void)
+{
+	signal(SIGQUIT, SIG_DFL);
+}

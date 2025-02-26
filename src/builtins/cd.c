@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/25 16:39:05 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/26 10:23:32 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,38 +73,10 @@ static void	update_pwd(t_shell *shell, char *param)
 	free(pwd);
 }
 
-int	handle_cd_sign(t_shell *shell, char **params)
-{
-	char	*path;
-	
-	if (count_arg(params) == 1 || (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2)))
-    {
-        path = get_elem_env(shell->env, "HOME");
-        if (!path)
-        {
-            printf("cd: HOME not set\n");
-            return (1);
-        }
-    }
-    else if (count_arg(params) == 2 && !ft_strncmp(params[1], "-", 2))
-    {
-        path = get_elem_env(shell->env, "OLDPWD");
-        if (!path)
-        {
-            printf("cd: OLDPWD not set\n");
-            return (1);
-        }
-        printf("%s\n", path);
-    }
-	return (0);
-}
-
 int	cd(t_shell *shell, char **params)
 {
 	int	res;
-	char	*path;
 
-	handle_cd_sign(&shell, &params);
 	if (count_arg(params) == 2)
 	{
 		res = chdir(params[1]);

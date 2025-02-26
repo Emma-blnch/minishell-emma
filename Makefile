@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+         #
+#    By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: Invalid date        by                   #+#    #+#              #
-#    Updated: 2025/02/25 16:42:48 by ema_blnch        ###   ########.fr        #
+#    Updated: 2025/02/26 09:28:14 by eblancha         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,15 +33,21 @@ DIR_LIB		= $(DIR_INC)/libft
 
 HEADER		= $(DIR_INC)/minishell.h
 
-FUNC_EXEC	= 	execution.c \
-				readability.c \
-				redirection.c \
-				path.c \
-				setup.c \
-				heredoc.c \
-				errors.c \
-				ast.c
+# FUNC_EXEC	= 	execution.c \
+# 				readability.c \
+# 				redirection.c \
+# 				path.c \
+# 				setup.c \
+# 				heredoc.c \
+# 				errors.c \
+# 				ast.c
 
+FUNC_EXEC	=	exec.c \
+				exec2.c \
+				find_cmd.c \
+				here_doc.c \
+				launch_builtin.c \
+				utils.c
 				
 FUNC_PARS	=	cleanup.c \
 				cmd_fd.c \
@@ -54,6 +60,7 @@ FUNC_PARS	=	cleanup.c \
 				quote.c \
 				readline.c \
 				signals.c \
+				signals2.c \
 				token_utils.c \
 				token.c
 
@@ -65,7 +72,7 @@ FUNC_BUTI	=	cd.c \
 				export_utils.c \
 				pwd.c \
 				unset.c \
-				builtins.c
+				# builtins.c
 
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \
 				$(addprefix $(DIR_PARS)/, $(FUNC_PARS)) \
@@ -87,6 +94,12 @@ INC			= -I$(DIR_INC) -I$(DIR_LIB)
 CC			= cc
 
 CFLAGS		= -Wall -Wextra -Werror
+
+DEF_COLOR	= \033[0;39m
+GREEN 		= \033[0;92m
+YELLOW 		= \033[0;93m
+BLUE		= \033[0;94m
+MAGENTA		= \033[0;95m
 
 # **************************************************************************** #
 #		Unit test variables													   #
@@ -129,6 +142,7 @@ all:				$(NAME)
 $(NAME):			$(DEP) $(OBJ)
 					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ) -L$(DIR_LIB) \
 					-lft -lreadline
+					@echo "$(GREEN)Minishell Compiled!$(DEF_COLOR)"
 
 $(DIR_OBJ)/%.o:		$(DIR_SRC)/%.c
 					$(CC) $(CFLAGS) $(INC) -c $< -o  $@
@@ -175,13 +189,16 @@ clean:
 			rm -rf $(DIR_OBJ)
 			rm -rf $(T_DIR)/$(T_NAME)
 			make -C $(DIR_LIB) clean
+			@echo "$(MAGENTA)Minishell objects cleaned !$(DEF_COLOR)"
 
 fclean:
 			rm -rf $(DIR_OBJ)
 			rm -rf $(T_DIR)/$(T_NAME)
 			rm -rf $(NAME)
 			make -C $(DIR_LIB) fclean
+			@echo "$(YELLOW)Minishell cleaned !$(DEF_COLOR)"
 
 re:			fclean all
+			@echo "$(GREEN)Cleaned and rebuilt !$(DEF_COLOR)"
 
 .PHONY:		all clean fclean re debug test compile

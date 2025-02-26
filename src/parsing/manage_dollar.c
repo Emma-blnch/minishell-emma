@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   manage_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 09:15:25 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/25 16:13:46 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/26 10:15:39 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,10 @@ int	add_dollar(char *line, int *index, char **str, t_shell *shell)
 	}
 	else
 	{
-		// ++(*index);
-		// while (line[*index] && \
-		// 	(ft_isalnum(line[*index]) || line[*index] == '_'))
-		// 	++(*index);
+		++(*index);
+		while (line[*index] && \
+			(ft_isalnum(line[*index]) || line[*index] == '_'))
+			++(*index);
 		return (1);
 	}
 }

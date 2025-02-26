@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
+/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:49:13 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/25 16:44:54 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/26 10:22:55 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ bool pipe_error(t_shell *shell)
 
 bool	operator_error(t_shell *shell)
 {
-	printf("hello\n");
+	// printf("hello\n");
 	if (shell->token && shell->token->prev->type == PIPE)
 	{
 		write(2, "Error: Unclosed pipe\n", 21);
@@ -148,8 +148,8 @@ bool	parse_cmd(t_shell *shell, char *input)
 		free_all(shell, ERR_MALLOC, EXT_MALLOC);
 	}
 	free(input);
-	//print_token(shell->token);
-	printf("hello1\n");
+	// print_token(shell->token);
+	// printf("hello1\n");
 	//if (!pipe_error(shell))
 	//	return (false);
 	if (!operator_error(shell))
@@ -177,7 +177,7 @@ int	init_readline(t_shell *shell)
 		add_history(input);
 		if (!parse_cmd(shell, input))
 			continue;
-		if (!exec_tree(shell))
+		if (!exec(shell))
 			free_all(shell, ERR_PIPE, EXT_PIPE);
 		free_cmd(&shell->cmd);
 		free_token(&shell->token);
