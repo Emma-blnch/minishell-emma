@@ -6,7 +6,7 @@
 /*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:49:13 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/27 10:00:25 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/27 10:04:17 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,7 @@ bool	pipe_error(t_shell *shell)
 
 	prev_tmp = NULL;
 	if (!shell->token)
-	{
-		write(2, "Error: No tokens found\n", 23);
-		return (false);
-	}
+		return (write(2, "Error: No tokens found\n", 23), false);
 	tmp = shell->token;
 	while (tmp)
 	{
@@ -36,8 +33,7 @@ bool	pipe_error(t_shell *shell)
 		{
 			write(2, "Error: Invalid pipe usage (consecutive pipes)\n", 46);
 			shell->exit_code = 2;
-			free_token(&shell->token);
-			return (false);
+			return (free_token(&shell->token), false);
 		}
 		prev_tmp = tmp;
 		tmp = tmp->next;
