@@ -3,13 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/26 10:36:49 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:43:54 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -125,8 +124,7 @@ bool		get_infile(t_shell *shell, t_token *token, t_cmd *cmd);
 char		**get_param(t_shell *shell, t_token *token);
 
 /* HEREDOC */
-
-int	here_doc(t_shell *shell, char *word);
+int			here_doc(t_shell *shell, char *word);
 
 /* EXECUTION */
 
@@ -138,14 +136,13 @@ char		**lst_to_arr(t_list *env);
 //int			create_process_or_pipe(t_shell *shell, int *fd, bool is_pipe);
 //void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 //void		command_into_array(t_cmd *cmd);
-bool	exec(t_shell *data);
-void	child_process(t_shell *data, t_cmd *cmd, int *pip);
-char	*find_cmd(t_shell *data, char *sample, t_list *env);
-int	ft_strslashjoin(char *dest, char *str, char *env, int *index);
-int	here_doc(t_shell *data, char *word);
-size_t	len_cmd(t_cmd *list);
-void	absolute_path(char **path, char *cmd, t_shell *data);
-void	sort_array(char **arr, int len);
+bool		exec(t_shell *data);
+void		child_process(t_shell *data, t_cmd *cmd, int *pip);
+char		*find_cmd(t_shell *data, char *sample, t_list *env);
+int			ft_strslashjoin(char *dest, char *str, char *env, int *index);
+size_t		len_cmd(t_cmd *list);
+void		absolute_path(char **path, char *cmd, t_shell *data);
+void		sort_array(char **arr, int len);
 
 /* BUILT IN */
 
@@ -158,7 +155,9 @@ int			ft_unset(char **str, t_list **env);
 t_list		*find_env(t_list *env_list, char *env_name);
 int			pwd(void);
 void		ft_exit(t_shell *shell, char **args);
-bool			launch_builtin(t_shell *shell, t_cmd *cmd);
+void		error_malloc(void);
+int			count_arg(char **params);
+bool		launch_builtin(t_shell *shell, t_cmd *cmd);
 bool		is_builtin(char *cmd);
 
 /* REDIRECTION */
@@ -191,10 +190,10 @@ int			free_list(t_list **list);
 
 /* SIGNALS */
 
-void	clear_rl_line(void);
-void	signals(void);
-void	handle_sigtstp(int code);
-void	signals2(void);
+void		clear_rl_line(void);
+void		signals(void);
+void		handle_sigtstp(int code);
+void		signals2(void);
 
 /* DEBUG */
 

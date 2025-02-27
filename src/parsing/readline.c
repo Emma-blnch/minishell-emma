@@ -3,107 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:49:13 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/26 10:22:55 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 10:00:25 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*void	print_token(t_token *token)
+bool	pipe_error(t_shell *shell)
 {
 	t_token	*tmp;
+	t_token	*prev_tmp;
 
-	tmp = token;
-	while (tmp->next != token)
+	prev_tmp = NULL;
+	if (!shell->token)
 	{
-		printf("Type : %d, [%s]\n", tmp->type, tmp->str);
+		write(2, "Error: No tokens found\n", 23);
+		return (false);
+	}
+	tmp = shell->token;
+	while (tmp)
+	{
+		printf("Token address: %p, Next address: %p\n", (void *)tmp, (void *)tmp->next);
+		if (tmp == prev_tmp)
+		{
+			write(2, "Error: Detected a cycle in the token list\n", 41);
+			break ;
+		}
+		if (tmp->type == PIPE && tmp->next && tmp->next->type == PIPE)
+		{
+			write(2, "Error: Invalid pipe usage (consecutive pipes)\n", 46);
+			shell->exit_code = 2;
+			free_token(&shell->token);
+			return (false);
+		}
+		prev_tmp = tmp;
 		tmp = tmp->next;
-	}
-	printf("Type : %d, [%s]\n",  tmp->type, tmp->str);
-}*/
-
-bool pipe_error(t_shell *shell)
-{
-    t_token *tmp;
-    t_token *prev_tmp = NULL;  // Ajout d'une variable pour vérifier si on entre dans un cycle
-
-    // Vérifie si la liste des tokens est vide
-    if (!shell->token)
-    {
-        write(2, "Error: No tokens found\n", 23);
-        return (false);
-    }
-
-    tmp = shell->token;
-    while (tmp)
-    {
-        // Débogage pour afficher l'adresse du token et de son prochain
-        printf("Token address: %p, Next address: %p\n", (void *)tmp, (void *)tmp->next);
-
-        // Vérifie si on est déjà passé par ce token (cycle)
-        if (tmp == prev_tmp)
-        {
-            write(2, "Error: Detected a cycle in the token list\n", 41);
-            break;  // Sortir de la boucle si un cycle est détecté
-        }
-
-        // Vérifie si tmp->next existe avant d'accéder à tmp->next->type
-        if (tmp->type == PIPE && tmp->next && tmp->next->type == PIPE)
-        {
-            // Affiche une erreur si deux pipes consécutifs sont trouvés
-            write(2, "Error: Invalid pipe usage (consecutive pipes)\n", 46);
-            shell->exit_code = 2;
-            free_token(&shell->token);
-            return (false);
-        }
-
-        prev_tmp = tmp;  // Garde une trace du token précédent
-        tmp = tmp->next; // Avance au token suivant
-    }
-	return (true);
-}
-
-
-bool	operator_error(t_shell *shell)
-{
-	// printf("hello\n");
-	if (shell->token && shell->token->prev->type == PIPE)
-	{
-		write(2, "Error: Unclosed pipe\n", 21);
-		shell->exit_code = 2;
-		free_token(&shell->token);
-		return (false);
-	}
-	if (shell->token && shell->token->prev->type == APPEND)
-	{
-		write(2, "Error: Unclosed append\n", 21);
-		shell->exit_code = 2;
-		free_token(&shell->token);
-		return (false);
-	}
-	if (shell->token && shell->token->prev->type == HEREDOC)
-	{
-		write(2, "Error: Unclosed heredoc\n", 21);
-		shell->exit_code = 2;
-		free_token(&shell->token);
-		return (false);
-	}
-	if (shell->token && shell->token->prev->type == INPUT)
-	{
-		write(2, "Error: Unclosed input\n", 21);
-		shell->exit_code = 2;
-		free_token(&shell->token);
-		return (false);
-	}
-	if (shell->token && shell->token->prev->type == TRUNC)
-	{
-		write(2, "Error: Unclosed trunc\n", 21);
-		shell->exit_code = 2;
-		free_token(&shell->token);
-		return (false);
 	}
 	return (true);
 }
@@ -173,10 +110,10 @@ int	init_readline(t_shell *shell)
 		if (!input)
 			free_all(shell, "exit\n", shell->exit_code);
 		if (empty_input(input))
-			continue;
+			continue ;
 		add_history(input);
 		if (!parse_cmd(shell, input))
-			continue;
+			continue ;
 		if (!exec(shell))
 			free_all(shell, ERR_PIPE, EXT_PIPE);
 		free_cmd(&shell->cmd);
@@ -187,3 +124,16 @@ int	init_readline(t_shell *shell)
 	free_all(shell, NULL, -1);
 	return (0);
 }
+
+/*void	print_token(t_token *token)
+{
+	t_token	*tmp;
+
+	tmp = token;
+	while (tmp->next != token)
+	{
+		printf("Type : %d, [%s]\n", tmp->type, tmp->str);
+		tmp = tmp->next;
+	}
+	printf("Type : %d, [%s]\n",  tmp->type, tmp->str);
+}*/

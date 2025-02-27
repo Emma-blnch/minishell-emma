@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 15:58:53 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 10:50:38 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:37:52 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	*read_till_newline(int fd, char *static_buffer)
 	if (!static_buffer)
 		static_buffer = ft_calloc(1, sizeof(char));
 	if (!static_buffer)
-	return (NULL);
+		return (NULL);
 	current_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!current_buffer)
 		return (NULL);

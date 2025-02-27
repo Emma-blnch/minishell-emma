@@ -3,33 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   dollar_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 09:21:55 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/26 10:36:49 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:53:39 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-size_t	len_list(t_list *list)
-{
-	t_list	*tmp;
-	size_t	i;
-
-	if ((list))
-	{
-		tmp = list;
-		i = 1;
-		while (tmp->next != list)
-		{
-			++i;
-			tmp = tmp->next;
-		}
-		return (i);
-	}
-	return (0);
-}
 
 static int	ft_search(char *str, char c)
 {

@@ -3,57 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/26 11:31:14 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:47:51 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	count_arg(char **params)
-{
-	int	count;
-
-	count = 0;
-	while (params[count])
-		count++;
-	return (count);
-}
-
-static void	error_malloc(void)
-{
-	print_error2(ERR_MALLOC);
-	return ;
-}
-
-// static void	update_oldpwd(t_shell *data)
-// {
-// 	t_list	*tmp;
-// 	char	*test;
-// 	int		len;
-
-// 	tmp = data->env;
-// 	test = NULL;
-// 	len = len_list(tmp);
-// 	while (len--)
-// 	{
-// 		if (ft_strncmp(tmp->str, "PWD=", 3) == 0)
-// 			test = tmp->str;
-// 		tmp = tmp->next;
-// 	}
-// 	if (!test)
-// 		export2("OLDPWD", &data->env);
-// 	if (test)
-// 	{
-// 		test = ft_strjoin("OLD", test);
-// 		if (!test)
-// 			return (error_malloc());
-// 		export2(test, &data->env);
-// 	}
-// 	free(test);
-// }
 static void	update_oldpwd(t_shell *data)
 {
 	t_list	*tmp;
@@ -69,7 +27,6 @@ static void	update_oldpwd(t_shell *data)
 	export2(oldpwd, &data->env);
 	free(oldpwd);
 }
-
 
 static void	update_pwd(t_shell *data, char *param)
 {
@@ -89,24 +46,15 @@ static void	update_pwd(t_shell *data, char *param)
 	free(pwd);
 }
 
-// int	cd(t_shell *data, char **params)
-// {
-// 	int	res;
-// 	char	*path;
-
-// 	if (count_arg(params) == 2)
-// 	{
-// 		res = chdir(params[1]);
-// 		if (res == 0)
-// 			update_pwd(data, params[1]);
-// 		if (res == -1)
-// 			res *= -1;
-// 		if (res == 1)
-// 			perror(params[1]);
-// 		return (res);
-// 	}
-// 	return (1);
-// }
+static int	check_res(int res, char *path, t_shell *data)
+{
+	if (res == 0)
+		update_pwd(data, path);
+	if (res == -1)
+		res *= -1;
+	if (res == 1)
+		perror(path);
+}
 
 int	cd(t_shell *data, char **params)
 {
@@ -116,14 +64,12 @@ int	cd(t_shell *data, char **params)
 
 	path = NULL;
 	allocated = false;
-	if (count_arg(params) == 1 || (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2))) //Cas `cd` ou `cd ~` : aller à `$HOME`
+	if (count_arg(params) == 1
+		|| (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2)))
 	{
 		path = get_elem_env(data->env, "HOME");
 		if (!path)
-		{
-			printf("cd: HOME not set\n");
-			return (1);
-		}
+			return (printf("cd: HOME not set\n"), 1);
 		allocated = true;
 	}
 	else if (count_arg(params) == 2)
@@ -131,12 +77,7 @@ int	cd(t_shell *data, char **params)
 	if (path != NULL)
 	{
 		res = chdir(path);
-		if (res == 0)
-			update_pwd(data, path);
-		if (res == -1)
-			res *= -1;
-		if (res == 1)
-			perror(path);
+		check_res(res, path, data);
 		if (allocated)
 			free(path);
 		return (res);
