@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_cmd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 09:37:18 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/24 10:19:32 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/27 09:51:58 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ bool	create_list_cmd(t_shell *shell)
 	if (!norm(shell, tmp))
 		return (false);
 	tmp = tmp->next;
-	while (tmp !=shell->token)
+	while (tmp != shell->token)
 	{
 		if (tmp->prev->type == PIPE)
 		{

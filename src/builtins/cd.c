@@ -6,27 +6,11 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2025/03/06 09:55:10 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/03/06 11:20:43 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-static int	count_arg(char **params)
-{
-	int	count;
-
-	count = 0;
-	while (params[count])
-		count++;
-	return (count);
-}
-
-static void	error_malloc(void)
-{
-	print_error2(ERR_MALLOC);
-	return ;
-}
 
 static void	update_oldpwd(t_shell *data)
 {
@@ -43,7 +27,6 @@ static void	update_oldpwd(t_shell *data)
 	export2(oldpwd, &data->env);
 	free(oldpwd);
 }
-
 
 static void	update_pwd(t_shell *data, char *param)
 {
@@ -71,14 +54,12 @@ int	cd(t_shell *data, char **params)
 
 	path = NULL;
 	allocated = false;
-	if (count_arg(params) == 1 || (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2))) //Cas `cd` ou `cd ~` : aller à `$HOME`
+	if (count_arg(params) == 1
+		|| (count_arg(params) == 2 && !ft_strncmp(params[1], "~", 2)))
 	{
 		path = get_elem_env(data->env, "HOME");
 		if (!path)
-		{
-			printf("cd: HOME not set\n");
-			return (1);
-		}
+			return (printf("cd: HOME not set\n"), 1);
 		allocated = true;
 	}
 	else if (count_arg(params) == 2)
@@ -86,12 +67,7 @@ int	cd(t_shell *data, char **params)
 	if (path != NULL)
 	{
 		res = chdir(path);
-		if (res == 0)
-			update_pwd(data, path);
-		if (res == -1)
-			res *= -1;
-		if (res == 1)
-			perror(path);
+		check_res(res, path, data);
 		if (allocated)
 			free(path);
 		return (res);

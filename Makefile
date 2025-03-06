@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+         #
+#    By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: Invalid date        by                   #+#    #+#              #
-#    Updated: 2025/02/26 09:28:14 by eblancha         ###   ########.fr        #
+#    Updated: 2025/02/27 09:54:42 by ema_blnch        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,9 +62,11 @@ FUNC_PARS	=	cleanup.c \
 				signals.c \
 				signals2.c \
 				token_utils.c \
-				token.c
+				token.c \
+				list_utils.c \
 
 FUNC_BUTI	=	cd.c \
+				cd_utils.c \
 				echo.c \
 				env.c \
 				exit.c \
@@ -72,7 +74,6 @@ FUNC_BUTI	=	cd.c \
 				export_utils.c \
 				pwd.c \
 				unset.c \
-				# builtins.c
 
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \
 				$(addprefix $(DIR_PARS)/, $(FUNC_PARS)) \

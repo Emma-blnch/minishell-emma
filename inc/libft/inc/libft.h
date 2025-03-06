@@ -6,10 +6,9 @@
 /*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 13:19:31 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/25 16:21:00 by ema_blnch        ###   ########.fr       */
+/*   Updated: 2025/02/27 09:39:15 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef LIBFT_H
 # define LIBFT_H
@@ -93,4 +92,4 @@ int		ft_atoi_base(char *str, char *base);
 void	ft_lstpop(t_list **head, t_list *node, void (*del)(void *));
 int		ft_iseven(int num);
 
-# endif
+#endif

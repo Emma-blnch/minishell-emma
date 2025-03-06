@@ -3,34 +3,37 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:50:04 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/26 11:37:41 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:55:38 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// int	main(int argc, char **argv, char **envp)
-// {
-// 	t_shell	*shell;
-// 	char	*false_argv[2] = {"export", NULL};
-
-// 	shell = create_minishell(envp);
-// 	if (argc > 1)
-// 	{
-// 		export(shell, &argv[1], STDOUT_FILENO);
-// 		fprintf(stderr, "export done\n\n");
-// 		export(shell, false_argv, STDOUT_FILENO);
-// 		unset(shell, &argv[1]);
-// 		fprintf(stderr, "unset done\n\n");
-// 		export(shell, false_argv, STDOUT_FILENO);
-// 	}
-// 	return (0);
-// }
-
 pid_t	g_signal_pid;
+
+void	free_all(t_shell *shell, char *err, int ext)
+{
+	if (shell->cmd)
+		free_cmd(&shell->cmd);
+	if (shell->token)
+		free_token(&shell->token);
+	if (shell->env)
+		free_list(&shell->env);
+	if (shell->pip[0] && shell->pip[0] != -1)
+		close(shell->pip[0]);
+	if (shell->pip[1] && shell->pip[1] != -1)
+		close(shell->pip[1]);
+	if (err)
+		print_error2(err);
+	rl_clear_history();
+	if (!access(".heredoc.tmp", F_OK))
+		unlink(".heredoc.tmp");
+	if (ext != -1)
+		exit(ext);
+}
 
 bool	make_env(t_shell *shell)
 {

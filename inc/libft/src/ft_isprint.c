@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 17:28:46 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 10:04:58 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:37:30 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,3 @@ int	ft_tolower(int c)
 		return (c + ' ');
 	return (c);
 }
-

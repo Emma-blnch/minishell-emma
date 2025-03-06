@@ -3,17 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 10:48:36 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/26 10:36:49 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:55:24 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/*if (shell->paths)
-		ft_free_tab(shell->paths);*/
 
 int	free_list(t_list **list)
 {
@@ -97,25 +94,4 @@ void	free_cmd(t_cmd **list)
 	free_all_cmd(current);
 	free(current);
 	*list = NULL;
-}
-
-void	free_all(t_shell *shell, char *err, int ext)
-{
-	if (shell->cmd)
-		free_cmd(&shell->cmd);
-	if (shell->token)
-		free_token(&shell->token);
-	if (shell->env)
-		free_list(&shell->env);
-	if (shell->pip[0] && shell->pip[0] != -1)
-		close(shell->pip[0]);
-	if (shell->pip[1] && shell->pip[1] != -1)
-		close(shell->pip[1]);
-	if (err)
-		print_error2(err);
-	rl_clear_history();
-	if (!access(".heredoc.tmp", F_OK))
-		unlink(".heredoc.tmp");
-	if (ext != -1)
-		exit(ext);
 }

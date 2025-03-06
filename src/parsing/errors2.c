@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   errors2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahamini <ahamini@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ema_blnch <ema_blnch@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/24 10:41:42 by ahamini           #+#    #+#             */
-/*   Updated: 2025/02/24 10:43:32 by ahamini          ###   ########.fr       */
+/*   Updated: 2025/02/27 09:51:03 by ema_blnch        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ void	set_error(int err_code, t_shell *shell, char *err_message)
 }
 
 void	set_error_if(int condition, int err_code, t_shell *shell,
-    char *err_message)
+	char *err_message)
 {
-if (condition)
-    set_error(err_code, shell, err_message);
+	if (condition)
+		set_error(err_code, shell, err_message);
 }
