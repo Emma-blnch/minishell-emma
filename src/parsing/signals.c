@@ -6,7 +6,7 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2025/03/06 09:53:46 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/03/06 10:01:18 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,13 @@ void	clear_rl_line(void)
 	rl_on_new_line();
 }
 
-void	handle_sigint(int code)
+static void	handle_sigint(int code)
 {
 	(void)code;
 	printf("\n");
+	clear_rl_line();
 	if (g_signal_pid == 0)
-	{
-		clear_rl_line();
 		rl_redisplay();
-	}
-	else
-	{
-		g_signal_pid = 130;
-		clear_rl_line();
-	}
 }
 
 static void	handle_sigsegv(int code)
