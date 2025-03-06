@@ -6,7 +6,7 @@
 /*   By: eblancha <eblancha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:40 by skassimi          #+#    #+#             */
-/*   Updated: 2025/02/26 10:44:02 by eblancha         ###   ########.fr       */
+/*   Updated: 2025/03/06 09:53:16 by eblancha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,18 @@
 
 int	pwd(void)
 {
-	char	cwd[PATH_MAX];
+	char	*cwd;
+	char buffer[PATH_MAX];
 
-	if (getcwd(cwd, PATH_MAX))
+	cwd = getenv("PWD");
+	if (cwd)
 	{
 		printf("%s\n", cwd);
+		return (0);
+	}
+	if (getcwd(buffer, PATH_MAX))
+	{
+		printf("%s\n", buffer);
 		return (0);
 	}
 	else
